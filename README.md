@@ -18,7 +18,11 @@ You fill in the sheets with the appropriate information. That's easy!
 
 ### Way of Writing
 Follow the google sheet link:
+Version 2.2
 > https://docs.google.com/spreadsheets/d/1hcY4uFiO1AIiaXidalKlodo1Nm-MFGM5hCZzPGHShnw/edit?usp=sharing
+
+Version 3.0
+> https://docs.google.com/spreadsheets/d/1ovY8G8na6QeCAW9mCbqPUAoZBB73B6MwnLqcRlx2Ekg/edit?usp=share_link
 
 Instructions:
 Make a copy on your local Google Drive of the file and start taking notes.
