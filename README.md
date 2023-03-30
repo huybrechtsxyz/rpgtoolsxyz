@@ -1,6 +1,27 @@
 # RPG Tools
 Role playing game tools and applications from Huybrechts XYZ.
 
+## TL;DR
+Campaign Tracker v2.2
+> https://docs.google.com/spreadsheets/d/1hcY4uFiO1AIiaXidalKlodo1Nm-MFGM5hCZzPGHShnw/edit?usp=sharing
+
+Campaign Tracker v3.0
+> https://docs.google.com/spreadsheets/d/1ovY8G8na6QeCAW9mCbqPUAoZBB73B6MwnLqcRlx2Ekg/edit?usp=share_link
+
+Proficiency Builder
+> https://docs.google.com/spreadsheets/d/1T1EkyOOBqG-Mjmlic2bDapcTE47YEVj18uYSGN1aSXk/edit?usp=sharing
+
+## Proficiency Builder
+### Way of Thinking
+How OP is a build?
+
+### Way of Working
+Add proficiencies and build what you like.
+
+### Way of Writing
+Follow the google sheet link:
+> https://docs.google.com/spreadsheets/d/1T1EkyOOBqG-Mjmlic2bDapcTE47YEVj18uYSGN1aSXk/edit?usp=sharing
+
 ## Campaign Tracker
 ### Way of Thinking
 The RPG campaign and party tracker provides:
