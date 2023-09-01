@@ -33,7 +33,7 @@ Specific module information has priority over the compendium information. Your a
 
 === Way of Working
 
-Create a new project by using the commandline. This will create a folder structure for you to complete.
+Create a new project by using the commandline. This will create a folder structure for you to complete based on default settings.
 
 [filetree]
 > project +
