@@ -1,0 +1,47 @@
+{
+  "project": {
+    "settings": {
+      "name":"",
+      "title":"",
+      "version":"0.0.1",
+      "description":""
+    },
+    "folders": [
+      {
+        "name": "assets",
+        "folders": []
+      },
+      {
+        "name": "mods",
+        "folders": []
+      },
+      {
+        "name": "repo",
+        "folders": []
+      },
+      {
+        "name": "resx",
+        "folders": []
+      },
+      {
+        "name": "story",
+        "folders": []
+      }
+    ]
+  },
+  "module": {
+    "settings": {
+
+    },
+    "folders": [
+      {
+        "name": "assets",
+        "folders": []
+      },
+      {
+        "name": "story",
+        "folders": []
+      }
+    ]
+  }
+}

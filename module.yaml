@@ -1,0 +1,21 @@
+#
+# MODULE
+#
+module:
+  id: 
+  title: 
+  version: 0.0.1
+  description: 
+  authors:
+    - 
+      name: 
+      discord: 
+      url:  
+  deployment:
+    url: 
+    bugs: 
+    manifest:
+    download: 
+  folders:
+    - ./assets    
+    
