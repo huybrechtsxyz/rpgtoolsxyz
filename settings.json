@@ -9,23 +9,30 @@
     "folders": [
       {
         "name": "assets",
-        "folders": []
+        "folders": [],
+        "files": [
+          "./assets/test.txt"
+        ]
       },
       {
         "name": "mods",
-        "folders": []
+        "folders": [],
+        "files": []
       },
       {
         "name": "repo",
-        "folders": []
+        "folders": [],
+        "files": []
       },
       {
         "name": "resx",
-        "folders": []
+        "folders": [],
+        "files": []
       },
       {
         "name": "story",
-        "folders": []
+        "folders": [],
+        "files": []
       }
     ]
   },
@@ -36,11 +43,15 @@
     "folders": [
       {
         "name": "assets",
-        "folders": []
+        "folders": [],
+        "files": [
+          "./assets/test.txt"
+        ]
       },
       {
         "name": "story",
-        "folders": []
+        "folders": [],
+        "files": []
       }
     ]
   }
