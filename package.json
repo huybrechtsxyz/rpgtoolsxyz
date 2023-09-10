@@ -1,14 +1,22 @@
 {
-    "name": "rpgtoolsxyz",
-    "version": "0.0.1",
-    "description": "RPG Tools for building adventures out of an compendium",
-    "keywords": [],
-    "main": "app.js",
-    "type": "module",
-    "author": "Vincent Huybrechts (https://github.com/huybrechtsxyz)",
-    "license": "MIT",
-    "dependencies": {
-        "commander": "^6.2.0",
-        "js-yaml": "^4.1.0"
-    }
+  "name": "rpgtoolsxyz",
+  "version": "1.0.0",
+  "description": "Well here goes nothting",
+  "type": "module",
+  "main": "app.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/js-yaml": "^4.0.5",
+    "@types/node": "^20.5.9",
+    "commander": "^11.0.0",
+    "js-yaml": "^4.1.0"
+  }
 }
