@@ -5,14 +5,34 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Launch Program",
+      "name": "Launch - New Project",
       "program": "${workspaceFolder}/src/app.js",
-      "args": ["new-module", "atuaro-gauntlet", "e:/sources/atuaro - new"],
+      "args": ["new-project", "e:/sources", "atuaro - new"],
       "request": "launch",
       "skipFiles": [
         "<node_internals>/**"
       ],
-      "type": "pwa-node"
+      "type": "node"
+    },
+    {
+      "name": "Launch - New Module",
+      "program": "${workspaceFolder}/src/app.js",
+      "args": ["new-module", "e:/sources/atuaro - new", "gauntlet"],
+      "request": "launch",
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
+      "type": "node"
+    },
+    {
+      "name": "Launch - New Story",
+      "program": "${workspaceFolder}/src/app.js",
+      "args": ["new-story", "e:/sources/atuaro - new", "2023-dndave"],
+      "request": "launch",
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
+      "type": "node"
     }
   ]
 }

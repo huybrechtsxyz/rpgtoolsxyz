@@ -15,7 +15,4 @@ module:
     url: 
     bugs: 
     manifest:
-    download: 
-  folders:
-    - ./assets    
-    
+    download:

@@ -19,30 +19,25 @@ export function createDirectory(folder){
  * @param {string} targetPath
  * @var {string} subPath
  */
-export async function copyDirectories(sourcePath, targetPath) {
+export function copyDirectories(sourcePath, targetPath) {
   if (!fs.existsSync(sourcePath)) {
     console.log('   ! Invalid source path defined');
   }
 
-  fs.readdir(sourcePath, function (err, items) {
-    if (err) {
-      console.log(err.message);
-      return;
-    }
-    items.forEach(async function (itemname) {
-      var fullPath = path.join(sourcePath, itemname);
-      var stat = fs.statSync(fullPath);
-      if (stat.isDirectory()) {
-        var subPath = createDirectory(path.join(targetPath,itemname));
-        await copyDirectories(fullPath, subPath);
-      } else if (stat.isFile()) {
-        var filePath = path.join(targetPath, itemname);
-        if (!fs.existsSync(filePath)) {
-          fs.copyFileSync(fullPath, filePath);
-        }
+  const items = fs.readdirSync(sourcePath);
+  for(const itemname of items) {
+    var fullPath = path.join(sourcePath, itemname);
+    var stat = fs.statSync(fullPath);
+    if (stat.isDirectory()) {
+      var subPath = createDirectory(path.join(targetPath,itemname));
+      copyDirectories(fullPath, subPath);
+    } else if (stat.isFile()) {
+      var filePath = path.join(targetPath, itemname);
+      if (!fs.existsSync(filePath)) {
+        fs.copyFileSync(fullPath, filePath);
       }
-    });
-  });
+    }
+  }
 }
 
 // Read JSON file
@@ -67,6 +62,12 @@ export async function copyDirectories(sourcePath, targetPath) {
  */
 export function writeJsonFile(folder, filename, data) {
   fs.writeFile(path.join(folder, filename), JSON.stringify(data), err => { if (err) { throw err } });
+}
+
+// Merge 2 Json Objects
+export function mergeJsonData(data1, data2)
+{
+  return {...data1, ...data2};
 }
 
 // Read YAML file
