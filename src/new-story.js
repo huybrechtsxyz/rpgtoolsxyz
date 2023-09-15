@@ -1,25 +1,26 @@
 // Imports
 import fs from 'fs';
 import path from 'path';
-import { createDirectory, copyDirectories, readYamlFile, writeYamlFile } from './lib-files.js';
+import { createDirectory, copyDirectories } from './lib-files.js';
 
-export function newStory(appPath, projectPath, storyName) {
-  console.log('Creating a new story (campaign)' );
-  let assetPath = path.resolve(path.join(appPath, 'assets', 'new-story'));
+export function newStory(appPath, story, target, template) {
+
+  console.log('Creating a new story ' + story + ' with template ' + template );
+  let templatePath = path.resolve(path.join(appPath, 'assets', template));
+  let targetPath = path.resolve(path.join(target, 'stories'));
+  targetPath = createDirectory(targetPath);
   
-  if (!fs.existsSync(projectPath)) {
-    console.error('Invalid project path for ' + projectPath);
-    exit();
+  if (!fs.existsSync(templatePath)) {
+    throw error(`Invalid template ${template} (${templatePath}`);
+  }
+  if (!fs.existsSync(targetPath)) {
+    throw error(`Invalid target for ${story} (${targetPath})`);
   }
 
-  let rootPath = createDirectory(path.resolve(path.join(projectPath, 'stories')));
-  rootPath = createDirectory(path.resolve(path.join(rootPath, storyName)));
-  console.log(' - creating story ' + storyName + ' in ' + projectPath);
-  console.log(' - creating default story folders and files');
-  console.log(' - creating story path ' + rootPath);
-  createDirectory(rootPath);
-
-  console.log(' - creating story assets from ' + assetPath);
-  copyDirectories(assetPath, rootPath);
-  console.log(' - created story assets in ' + rootPath);
+  targetPath = path.join(targetPath, story);
+  console.log(' - creating default story folders and files...');
+  console.log(' - source: ' + templatePath);
+  console.log(' - target: ' + targetPath);
+  createDirectory(targetPath);
+  copyDirectories(templatePath, targetPath);
 }

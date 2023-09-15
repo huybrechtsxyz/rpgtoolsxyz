@@ -6,8 +6,8 @@
   "configurations": [
     {
       "name": "Launch - New Project",
-      "program": "${workspaceFolder}/src/app.js",
-      "args": ["new-project", "e:/sources", "atuaro - new"],
+      "program": "node ${workspaceFolder}/src/app.js",
+      "args": ["project", "atuaro - new", "-p", "'.\\app'"],
       "request": "launch",
       "skipFiles": [
         "<node_internals>/**"

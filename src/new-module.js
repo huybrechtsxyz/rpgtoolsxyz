@@ -1,32 +1,27 @@
 // Imports
 import fs from 'fs';
 import path from 'path';
-import { createDirectory, copyDirectories, readYamlFile, writeYamlFile } from './lib-files.js';
+import { error } from 'console';
+import { createDirectory, copyDirectories } from './lib-files.js';
 
-export function newModule(appPath, projectPath, moduleName) {
-  console.log('Creating a new module' );
-  let assetPath = path.resolve(path.join(appPath, 'assets', 'new-module'));
+export function newModule(appPath, module, target, template) {
+
+  console.log('Creating a new module ' + module + ' with template ' + template );
+  let templatePath = path.resolve(path.join(appPath, 'assets', template));
+  let targetPath = path.resolve(path.join(target, 'mods'));
+  targetPath = createDirectory(targetPath);
   
-  if (!fs.existsSync(projectPath)) {
-    console.error('Invalid project path for ' + projectPath);
-    exit();
+  if (!fs.existsSync(templatePath)) {
+    throw error(`Invalid template ${template} (${templatePath}`);
+  }
+  if (!fs.existsSync(targetPath)) {
+    throw error(`Invalid target for ${module} (${targetPath})`);
   }
 
-  let rootPath = createDirectory(path.resolve(path.join(projectPath, 'mods')));
-  rootPath = createDirectory(path.resolve(path.join(rootPath, moduleName)));
-  console.log(' - creating module ' + moduleName + ' in ' + projectPath);
-  console.log(' - creating default module folders and files');
-  console.log(' - creating module path ' + rootPath);
-  createDirectory(rootPath);
-
-  console.log(' - creating module assets from ' + assetPath);
-  copyDirectories(assetPath, rootPath);
-  console.log(' - created module assets in ' + rootPath);
-
-  let moduleFile = path.resolve(path.join(rootPath, './module.yaml'));
-  console.log(' - initializing default settings "' + moduleFile + '"');
-  let moduleData = readYamlFile(moduleFile);
-  moduleData.module.id = moduleName;
-  moduleData.module.title = moduleName;
-  writeYamlFile(rootPath, 'module.yaml', moduleData);
+  targetPath = path.join(targetPath, module);
+  console.log(' - creating default module folders and files...');
+  console.log(' - source: ' + templatePath);
+  console.log(' - target: ' + targetPath);
+  createDirectory(targetPath);
+  copyDirectories(templatePath, targetPath);
 }

@@ -1,19 +1,20 @@
 // Imports
 import path from 'path';
+import figlet from 'figlet';
 import { fileURLToPath } from 'url';
 import { Command } from 'commander';
-import { readJsonFile } from './lib-files.js';
-import { newProject } from './new-project.js';
-import { newModule } from './new-module.js';
-import { newStory } from './new-story.js';
+import { readJsonFile , writeJsonFile, readYamlFile, writeYamlFile } from './lib-files.js';
 
 // Read Package
+const cwdPath = process.cwd();
 const appPath = path.resolve(path.dirname(fileURLToPath(import.meta.url)) + '/..');
-
-// 
 const packageFile = path.resolve(path.join(appPath, './package.json'));
-console.log('Reading package configuration from...' + packageFile);
-const packageData = async () => { await readJsonFile(packageFile) };
+const packageData = await readJsonFile(packageFile);
+console.log(figlet.textSync(packageData.title));
+console.log('Description: ' + packageData.description);
+console.log(' - Work path: ' + cwdPath);
+console.log(' - App path: ' + appPath);
+console.log('');
 
 // Create command line interface
 const program = new Command();
@@ -21,20 +22,56 @@ program
   .name(packageData.name)
   .version(packageData.version);
 
-program
-  .command('new-project <projectPath> [projectName]')
-  .description('Creates a new project in the given folder')
-  .action((projectPath, projectName) => { newProject(appPath, path.resolve(projectPath), projectName) });
+// NEW
+const cmdNew = program.command('new');
 
-program
-  .command('new-module <projectPath> <moduleName>')
-  .description('Creates a new module for the given project')
-  .action((projectPath, moduleName) => { newModule(appPath, path.resolve(projectPath), moduleName) });
+// NEW - PROJECT
+import { newProject } from './new-project.js';
+const cmdNewProject = cmdNew.command('project');
+cmdNewProject
+  .argument('<project>', 'Name of the project')
+  .option('-p, --path <target>', 'Path where to create the project', cwdPath)
+  .option('-t, --template <template>', 'Selected template to create', 'new-project')
+  .description('Creates a new project in the given directory based on a template')
+  .action((project, options) => { newProject(appPath, project, options.path, options.template) });
 
-program
-  .command('new-story <projectPath> <storyName>')
-  .description('Creates a new story (campaign) for the given project')
-  .action((projectPath, storyName) => { newStory(appPath, path.resolve(projectPath), storyName) });
+// // NEW - MODULE
+import { newModule } from './new-module.js';
+const cmdNewModule = cmdNew.command('module');
+cmdNewModule
+  .argument('<module>', 'Name of the module')
+  .option('-p, --path <target>', 'Path of the project', cwdPath)
+  .option('-t, --template <template>', 'Selected template to create', 'new-module')
+  .description('Creates a new module in the given project based on a template')
+  .action((module, options) => { newModule(appPath, module, options.path, options.template) });
+
+// // NEW - STORY
+import { newStory } from './new-story.js';
+const cmdNewStory = cmdNew.command('story');
+cmdNewStory
+  .argument('<story>', 'Name of the story')
+  .option('-p, --path <target>', 'Path of the project', cwdPath)
+  .option('-t, --template <template>', 'Selected template to create', 'new-story')
+  .description('Creates a new storty in the given project based on a template')
+  .action((story, options) => { newStory(appPath, story, options.path, options.template) });
+
+// // NEW - ITEM
+import { newCreature } from './new-item.js';
+
+// // NEW - ITEM - CREATURE
+const cmdNewCreature = cmdNew.command('creature');
+cmdNewCreature
+  .argument('<creature>', 'Name of the creature')
+  .requiredOption('-k, --kind <kind>','Selected file to copy')
+  .requiredOption('-m, --markup <markup>', 'Select markup output type')
+  .option('-p, --path <target>', 'Path of the project', cwdPath)
+  .option('-t, --template <template>', 'Selected template to create', 'creature.yaml')
+  .option('-s, --source <source>', 'Selected source from which to copy [fvtt]',null)
+  .option('-c, --copy <copyof>','Selected file to copy',null)
+  .option('-f, --force','Selected file to copy',false)
+  .description('Creates a new creature in the given project based on a template and source', '')
+  .action((creature, options) => { newCreature(appPath, creature, options) });
 
 // Parse and execute commandline.
 program.parse(process.argv)
+console.log('');

@@ -1,7 +1,8 @@
 {
   "name": "rpgtoolsxyz",
-  "version": "1.0.0",
-  "description": "Well here goes nothting",
+  "title": "RPG Tools XYZ",
+  "version": "0.0.1",
+  "description": "Creation and maintenance of an RPG library.",
   "type": "module",
   "main": "app.js",
   "directories": {
@@ -17,6 +18,8 @@
     "@types/js-yaml": "^4.0.5",
     "@types/node": "^20.5.9",
     "commander": "^11.0.0",
-    "js-yaml": "^4.1.0"
+    "figlet": "^1.6.0",
+    "js-yaml": "^4.1.0",
+    "nedb": "^1.8.0"
   }
 }

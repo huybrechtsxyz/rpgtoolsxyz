@@ -3,6 +3,31 @@ import fs from 'fs';
 import fsp from 'fs/promises';
 import path from 'path';
 import yaml from 'js-yaml';
+import { error } from 'console';
+
+export const _MARKUP = {};
+  _MARKUP['ASCIIDOC'] = "ASCIIDOC";
+  _MARKUP['ASCIDOC'] = "ASCIIDOC";
+  _MARKUP['ADOC'] = "ASCIIDOC";
+  _MARKUP['MARKDOWN'] = "MARKDOWN";
+  _MARKUP['MD'] = "MARKDOWN";
+  _MARKUP['README'] = "MARKDOWN";
+  _MARKUP['PLAINTEXT'] = "TEXT";
+  _MARKUP['TEXT'] = "TEXT";
+  _MARKUP['TXT'] = "TEXT";
+
+export function getFilename(source, format) {
+  switch(_MARKUP[format.toUpperCase()]){
+    case 'ASCIIDOC':
+      return source + '.adoc';
+    case 'MARKDOWN':
+      return source + '.md';
+    case 'TEXT':
+      return source + '.txt';
+    default:
+      throw error(`Invalid format ${format} for ${_MARKUP}`);
+  }
+}
 
 /**
  * @param {fs.PathLike} folder
@@ -61,7 +86,7 @@ export function copyDirectories(sourcePath, targetPath) {
  * @param {object} data
  */
 export function writeJsonFile(folder, filename, data) {
-  fs.writeFile(path.join(folder, filename), JSON.stringify(data), err => { if (err) { throw err } });
+  fs.writeFile(path.join(folder, filename), JSON.stringify(data), err => { if (err) { throw err; } });
 }
 
 // Merge 2 Json Objects
@@ -89,4 +114,28 @@ export function readYamlFile(filename) {
 export function writeYamlFile(folder, filename, data) {
   let yamlData = yaml.dump(data);
   fs.writeFileSync(path.join(folder, filename), yamlData, 'utf8');
+}
+
+// READ DATA FILE
+export function readDataFile(filename) {
+  switch(path.extname(filename).toLowerCase()) {
+    case '.json':
+      return readJsonFile(filename);
+    case '.yaml':
+      return readYamlFile(filename);
+    default:
+      throw error(`Invalid file type for ${filename}`);
+  } 
+}
+
+// WRITE DATA FILE
+export function writeDataFile(folder, filename, data) {
+  switch(path.extname(filename).toLowerCase()) {
+    case '.json':
+      writeJsonFile(folder, filename, data);
+    case '.yaml':
+      writeYamlFile(folder, filename, data);
+    default:
+      throw error(`Invalid file type for ${filename}`);
+  } 
 }
