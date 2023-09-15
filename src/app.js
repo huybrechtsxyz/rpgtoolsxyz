@@ -3,7 +3,7 @@ import path from 'path';
 import figlet from 'figlet';
 import { fileURLToPath } from 'url';
 import { Command } from 'commander';
-import { readJsonFile , writeJsonFile, readYamlFile, writeYamlFile } from './lib-files.js';
+import { readJsonFile } from './lib-files.js';
 
 // Read Package
 const cwdPath = process.cwd();
@@ -63,11 +63,10 @@ const cmdNewCreature = cmdNew.command('creature');
 cmdNewCreature
   .argument('<creature>', 'Name of the creature')
   .requiredOption('-k, --kind <kind>','Selected file to copy')
-  .requiredOption('-m, --markup <markup>', 'Select markup output type')
   .option('-p, --path <target>', 'Path of the project', cwdPath)
   .option('-t, --template <template>', 'Selected template to create', 'creature.yaml')
-  .option('-s, --source <source>', 'Selected source from which to copy [fvtt]',null)
-  .option('-c, --copy <copyof>','Selected file to copy',null)
+  .option('-s, --source <source>', 'Selected source from which to copy [fvtt]')
+  .option('-c, --copy <copyof>','Selected file to copy')
   .option('-f, --force','Selected file to copy',false)
   .description('Creates a new creature in the given project based on a template and source', '')
   .action((creature, options) => { newCreature(appPath, creature, options) });
