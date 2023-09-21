@@ -1,9 +1,13 @@
-// Imports
+'use strict';
+
 import path from 'path';
 import figlet from 'figlet';
 import { fileURLToPath } from 'url';
 import { Command } from 'commander';
-import { readJsonFile } from './lib-files.js';
+
+import { readJsonFile } from './lib/filesystem.js';
+
+import projectCommands from './commands/projectCommands.js'
 
 // Read Package
 const cwdPath = process.cwd();
@@ -16,60 +20,29 @@ console.log(' - Work path: ' + cwdPath);
 console.log(' - App path: ' + appPath);
 console.log('');
 
+/** OPTIONS
+ * -p | --path : Path where to create resource : cwdPath
+ * -t | --template : Template for creating resource
+ */
+
 // Create command line interface
 const program = new Command();
 program
   .name(packageData.name)
   .version(packageData.version);
 
-// NEW
-const cmdNew = program.command('new');
+let commands = {
+  new: program.command('new'),
+  add: program.command('add'),
+  del: program.command('remove'),
+  list: program.command('list'),
+  get: program.command('get'),
+  set: program.command('set')
+};
 
-// NEW - PROJECT
-import { newProject } from './new-project.js';
-const cmdNewProject = cmdNew.command('project');
-cmdNewProject
-  .argument('<project>', 'Name of the project')
-  .option('-p, --path <target>', 'Path where to create the project', cwdPath)
-  .option('-t, --template <template>', 'Selected template to create', 'new-project')
-  .description('Creates a new project in the given directory based on a template')
-  .action((project, options) => { newProject(appPath, project, options.path, options.template) });
-
-// // NEW - MODULE
-import { newModule } from './new-module.js';
-const cmdNewModule = cmdNew.command('module');
-cmdNewModule
-  .argument('<module>', 'Name of the module')
-  .option('-p, --path <target>', 'Path of the project', cwdPath)
-  .option('-t, --template <template>', 'Selected template to create', 'new-module')
-  .description('Creates a new module in the given project based on a template')
-  .action((module, options) => { newModule(appPath, module, options.path, options.template) });
-
-// // NEW - STORY
-import { newStory } from './new-story.js';
-const cmdNewStory = cmdNew.command('story');
-cmdNewStory
-  .argument('<story>', 'Name of the story')
-  .option('-p, --path <target>', 'Path of the project', cwdPath)
-  .option('-t, --template <template>', 'Selected template to create', 'new-story')
-  .description('Creates a new storty in the given project based on a template')
-  .action((story, options) => { newStory(appPath, story, options.path, options.template) });
-
-// // NEW - ITEM
-import { newCreature } from './new-item.js';
-
-// // NEW - ITEM - CREATURE
-const cmdNewCreature = cmdNew.command('creature');
-cmdNewCreature
-  .argument('<creature>', 'Name of the creature')
-  .requiredOption('-k, --kind <kind>','Selected file to copy')
-  .option('-p, --path <target>', 'Path of the project', cwdPath)
-  .option('-t, --template <template>', 'Selected template to create', 'creature.yaml')
-  .option('-s, --source <source>', 'Selected source from which to copy [fvtt]')
-  .option('-c, --copy <copyof>','Selected file to copy')
-  .option('-f, --force','Selected file to copy',false)
-  .description('Creates a new creature in the given project based on a template and source', '')
-  .action((creature, options) => { newCreature(appPath, creature, options) });
+let subcommands = {
+  project: new projectCommands(commands, appPath, cwdPath)
+}
 
 // Parse and execute commandline.
 program.parse(process.argv)

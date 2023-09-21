@@ -22,5 +22,8 @@
     "js-yaml": "^4.1.0",
     "jsonpath": "^1.1.1",
     "nedb": "^1.8.0"
+  },
+  "dependencies": {
+    "nedb-promises": "^6.2.3"
   }
 }

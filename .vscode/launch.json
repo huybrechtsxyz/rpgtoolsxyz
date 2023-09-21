@@ -7,7 +7,7 @@
     {
       "name": "Launch - New Project",
       "program": "node ${workspaceFolder}/src/app.js",
-      "args": ["project", "atuaro - new", "-p", "'.\\app'"],
+      "args": ["new", "project", "atuaro - new", "-p", "'..'"],
       "request": "launch",
       "skipFiles": [
         "<node_internals>/**"
