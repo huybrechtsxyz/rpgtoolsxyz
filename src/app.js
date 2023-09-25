@@ -8,6 +8,7 @@ import { Command } from 'commander';
 import { readJsonFile } from './lib/filesystem.js';
 
 import projectCommands from './commands/projectCommands.js'
+import moduleCommands from './commands/moduleCommands.js'
 
 // Read Package
 const cwdPath = process.cwd();
@@ -21,7 +22,8 @@ console.log(' - App path: ' + appPath);
 console.log('');
 
 /** OPTIONS
- * -p | --path : Path where to create resource : cwdPath
+ * -p | --project : Linked project of the resource
+ * -f | --folder : Path where to create resource : cwdPath
  * -t | --template : Template for creating resource
  */
 
@@ -41,7 +43,8 @@ let commands = {
 };
 
 let subcommands = {
-  project: new projectCommands(commands, appPath, cwdPath)
+  project: new projectCommands(commands, appPath, cwdPath),
+  module: new moduleCommands(commands, appPath, cwdPath)
 }
 
 // Parse and execute commandline.

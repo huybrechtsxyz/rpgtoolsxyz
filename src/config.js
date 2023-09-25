@@ -1,7 +1,9 @@
 'use strict';
 
 const CONFIG = {
-  projectDB: 'data/projects.db'
+  configDB: 'data/config.db',
+  projectDB: 'data/projects.db',
+  moduleDB: 'data/modules.db'
 };
 
 export default CONFIG;

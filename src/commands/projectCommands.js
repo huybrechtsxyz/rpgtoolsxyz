@@ -14,17 +14,17 @@ class projectCommands {
     const cmdNew = (commands['new']).command('project');
     cmdNew
       .argument('<project>', 'Name for the project.')
-      .option('-p, --path <target>', 'Path where to create the project', cwdPath)
+      .option('-f, --folder <target>', 'Path where to create the project', cwdPath)
       .option('-t, --template <template>', 'Template for creating project', 'new-project')
       .description('Create a new project in the given path\project')
-      .action((project, options) => { this.controller.create(project, options.path, options.template); });
+      .action((project, options) => { this.controller.create(project, options); });
 
     const cmdAdd = (commands['add']).command('project');
     cmdAdd
       .argument('<project>', 'Name for the project.')
-      .requiredOption('-p, --path <target>', 'Path where to create the project', cwdPath)
+      .requiredOption('-f, --folder <target>', 'Path where to create the project', cwdPath)
       .description('Add an existing project with the given path')
-      .action((project, options) => { this.controller.add(project, options.path) });
+      .action((project, options) => { this.controller.add(project, options) });
 
     const cmdDel = (commands['del']).command('project');
     cmdDel
@@ -46,7 +46,7 @@ class projectCommands {
     const cmdSet = (commands['set']).command('project');
     cmdSet
       .argument('<project>', 'Name for the project.')
-      .option('-p, --path <target>', 'Path of the project', cwdPath)
+      .option('-f, --folder <target>', 'Path of the project', cwdPath)
       .description('Updates the information of a project')
       .action((project, options) => { this.controller.update(project, options); });
   }

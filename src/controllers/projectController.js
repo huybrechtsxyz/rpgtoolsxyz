@@ -5,21 +5,24 @@ import path from 'path';
 
 import projectItem from '../items/projectItem.js';
 import projectCollection from '../collections/projectCollection.js';
+import configController from './configController.js';
 import { createDirectory, cloneDirectories } from "../lib/filesystem.js";
 
 class projectController {
   baseDir;
   collection;
+  config;
 
   constructor(baseDir) {
     this.baseDir = baseDir;
+    this.config = new configController(baseDir);
     this.collection = new projectCollection(baseDir, true);
   }
 
-  async create(name, target, template) {
-    console.log('Creating project ' + name + ' with template ' + template);
-    template = path.resolve(path.join(this.baseDir, 'assets', template));
-    target = path.resolve(target);
+  async create(name, options) {
+    console.log('Creating project ' + name + ' with template ' + options.template);
+    let template = path.resolve(path.join(this.baseDir, 'assets', options.template));
+    let target = path.resolve(options.folder);
     if (!fs.existsSync(template))
       throw error(`Invalid template for ${template}`);
     if (!fs.existsSync(target))
@@ -38,6 +41,7 @@ class projectController {
       object.path = target;
     let item = await this.collection.create(object);
     if (item) {
+      this.config.setProject(item.name);
       for (var member in item) {
         if (!item.hasOwnProperty(member) || typeof(item[member]) === "function") continue;
         console.log(` - ${member}: ${item[member]}`);
@@ -46,14 +50,15 @@ class projectController {
       console.log(` - WARNING: Project ${name} already exists!`);
   }
 
-  async add(name, target) {
-    target = path.resolve(target);
+  async add(name, options) {
+    let target = path.resolve(options.folder);
     console.log(`Adding project ${name}`);
     if (!fs.existsSync(target))
       throw error(`Invalid target for ${target}`);
     console.log(' - adding to collection');
     let item = await this.collection.create({ name: name, path: target });
     if (item) {
+      this.config.setProject(item.name);
       for (var member in item) {
         if (!item.hasOwnProperty(member) || typeof(item[member]) === "function") continue;
         console.log(` - ${member}: ${item[member]}`);
@@ -65,7 +70,7 @@ class projectController {
   async update(name, options) {
     let project = new projectItem();
     project.name = name;
-    project.path = path.resolve(options.path);
+    project.path = path.resolve(options.folder);
     
     console.log('Updating project ' + project.name);
     if (!fs.existsSync(project.path))
@@ -74,6 +79,7 @@ class projectController {
     console.log(' - target: ' + project.path);
     let item = await this.collection.update(project);
     if (item) {
+      this.config.setProject(item.name);
       for (var member in item) {
         if (!item.hasOwnProperty(member) || typeof(item[member]) === "function") continue;
         console.log(` - ${member}: ${item[member]}`);
@@ -86,8 +92,10 @@ class projectController {
     console.log('Removing project ' + project);
     console.log(' - Removing project collection');
     let result = await this.collection.remove({ name: project });
-    if (result)
-    console.log(' - Removed from collecion');
+    if (result) {
+      this.config.setProject(null);
+      console.log(' - Removed from collecion');
+    }
   }
 
   async list() {
@@ -107,6 +115,7 @@ class projectController {
     console.log(' - searching collection');
     let item = await this.collection.findOne({ name: name });
     if (item) {
+      this.config.setProject(item.name);
       for (var member in item) {
         if (!item.hasOwnProperty(member) || typeof(item[member]) === "function") continue;
         console.log(` - ${member}: ${item[member]}`);
