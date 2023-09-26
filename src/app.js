@@ -5,10 +5,10 @@ import figlet from 'figlet';
 import { fileURLToPath } from 'url';
 import { Command } from 'commander';
 
+import CONFIG from './config.js';
 import { readJsonFile } from './lib/filesystem.js';
 
-import projectCommands from './commands/projectCommands.js'
-import moduleCommands from './commands/moduleCommands.js'
+import projectCommands from './commands/projectCommands.js';
 
 // Read Package
 const cwdPath = process.cwd();
@@ -21,13 +21,8 @@ console.log(' - Work path: ' + cwdPath);
 console.log(' - App path: ' + appPath);
 console.log('');
 
-/** OPTIONS
- * -p | --project : Linked project of the resource
- * -f | --folder : Path where to create resource : cwdPath
- * -t | --template : Template for creating resource
- */
-
 // Create command line interface
+await CONFIG.init(appPath);
 const program = new Command();
 program
   .name(packageData.name)
@@ -43,10 +38,10 @@ let commands = {
 };
 
 let subcommands = {
-  project: new projectCommands(commands, appPath, cwdPath),
-  module: new moduleCommands(commands, appPath, cwdPath)
+  project: new projectCommands(commands, appPath, cwdPath)
 }
 
 // Parse and execute commandline.
 program.parse(process.argv)
 console.log('');
+await CONFIG.dispose();

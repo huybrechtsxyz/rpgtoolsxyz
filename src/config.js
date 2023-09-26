@@ -1,32 +1,58 @@
-'use strict';
+'use-strict';
+
+import Data from './data.js';
+
+class configItem {
+  name;
+  project;
+}
 
 const CONFIG = {
   configDB: 'data/config.db',
   projectDB: 'data/projects.db',
-  moduleDB: 'data/modules.db'
-};
+  moduleDB: 'data/modules.db',
+
+  id_defaults: 'defaults',
+
+  baseDir: '',
+  
+  async init(baseDir) {
+    this.baseDir = baseDir;
+    this.data = new Data(baseDir, this.configDB);
+    await this.data.open();
+    this.defaults = await this.data.findOne(this.id_defaults);
+    if (this.defaults) {}
+    else {
+      this.defaults = new configItem();
+      this.defaults.name = this.id_defaults;
+      this.defaults.project = '';
+      await this.data.create(this.id_defaults, this.defaults);
+    }
+  },
+
+  async dispose() {
+    if (this.data.isOpen()) {
+      this.data.close();
+    }
+  },
+
+  async getProject() {
+    if (this.defaults)
+      return this.defaults.project;
+
+    await this.init(this.baseDir);
+    this.defaults = await this.data.findOne(this.id_defaults);
+    return this.defaults.project;
+  },
+
+  async setProject(project) {
+    if (this.defaults.project == project)
+      return;
+
+    await this.init(this.baseDir);
+    await this.data.update(this.id_defaults, this.defaults);
+    await this.dispose();
+  }
+}
 
 export default CONFIG;
-
-/*
-const CONFIG = {
-  baseURI: process.env.FLOOD_BASE_URI || '/',
-  dbCleanInterval: 1000 * 60 * 60,
-  dbPath: '/data/server/db/',
-  floodServerPort: 3000,
-  maxHistoryStates: 30,
-  pollInterval: 1000 * 5,
-  secret: process.env.FLOOD_SECRET || 'flood',
-  scgi: {
-    host: process.env.RTORRENT_SCGI_HOST || 'localhost',
-    port: process.env.RTORRENT_SCGI_PORT || 5000,
-    socket: process.env.RTORRENT_SOCK === 'true' || process.env.RTORRENT_SOCK === true,
-    socketPath: process.env.RTORRENT_SOCK_PATH || '/data/rtorrent.sock',
-  },
-  ssl: process.env.FLOOD_ENABLE_SSL === 'true' || process.env.FLOOD_ENABLE_SSL === true,
-  sslKey: '/data/flood_ssl.key',
-  sslCert: '/data/flood_ssl.cert',
-};
-
-module.exports = CONFIG;
-*/
