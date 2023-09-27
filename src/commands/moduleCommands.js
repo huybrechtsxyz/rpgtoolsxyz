@@ -52,6 +52,13 @@ class moduleCommands {
       .option('-p, --project <project>', 'Selected project')
       .description('Removes the module from the project')
       .action( async (module, options) => { await this.remove(module, options); });
+
+    const cmdSync = (commands['sync']).command('module');
+    cmdSync
+      .argument('<module>', 'Name of the module')
+      .option('-p, --project <project>', 'Selected project')
+      .description('Synchronizes the module information')
+      .action( async (module, options) => { await this.sync(module, options); });
   }
 
   async list(options) {
@@ -107,6 +114,11 @@ class moduleCommands {
     this.printValues(value, ` - WARNING: Module ${module} for project ${options.project} does not exists`);
   }
 
+  async sync(module, options) {
+    console.log('Syncrhonizing module ' + module + ' from collection');
+    
+  }
+
   printList(values) {
     if (values && values.length>0) {
       for (var item in values) {
@@ -125,7 +137,6 @@ class moduleCommands {
     } else
       console.log(warning);
   }
-
 }
 
 export default moduleCommands;

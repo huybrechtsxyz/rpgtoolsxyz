@@ -37,7 +37,8 @@ let commands = {
   del: program.command('remove'),
   list: program.command('list'),
   get: program.command('get'),
-  set: program.command('set')
+  set: program.command('set'),
+  sync: program.command('sync')
 };
 
 let subcommands = {
