@@ -1,57 +1,50 @@
 'use-strict';
 
-import Data from './data.js';
-
-class configItem {
-  name;
-  project;
-}
+import Datastore from './lib/datastore.js';
+import configController from './controllers/configController.js';
+import projectController from './controllers/projectController.js';
+import moduleController from './controllers/moduleController.js';
 
 const CONFIG = {
   configDB: 'data/config.db',
   projectDB: 'data/projects.db',
   moduleDB: 'data/modules.db',
 
-  id_defaults: 'defaults',
+  applicationPath: null,
+  currentWorkPath: null,
+  configController: null,
+  projectController: null,
 
-  baseDir: '',
-  
-  async init(baseDir) {
-    this.baseDir = baseDir;
-    this.data = new Data(baseDir, this.configDB);
-    await this.data.open();
-    this.defaults = await this.data.findOne(this.id_defaults);
-    if (this.defaults) {}
-    else {
-      this.defaults = new configItem();
-      this.defaults.name = this.id_defaults;
-      this.defaults.project = '';
-      await this.data.create(this.id_defaults, this.defaults);
-    }
+  async initialize(appPath, cwdPath) {
+    this.applicationPath = appPath;
+    this.currentWorkPath = cwdPath;
+
+    this.configController = new configController(new Datastore(appPath, this.configDB));
+    this.projectController = new projectController(new Datastore(appPath, this.projectDB));
+    this.moduleController = new moduleController(new Datastore(appPath, this.moduleDB));
+    
+    await this.configController.initialize();
+    await this.projectController.initialize();
+    await this.moduleController.initialize();
   },
 
   async dispose() {
-    if (this.data.isOpen()) {
-      this.data.close();
-    }
+    await this.moduleController.dispose();
+    await this.projectController.dispose();
+    await this.configController.dispose();
+    
+    this.moduleController = null;
+    this.projectController = null;
+    this.configController = null;
   },
 
-  async getProject() {
-    if (this.defaults)
-      return this.defaults.project;
-
-    await this.init(this.baseDir);
-    this.defaults = await this.data.findOne(this.id_defaults);
-    return this.defaults.project;
+  async getConfig() {
+    return await this.configController.read();
   },
 
-  async setProject(project) {
-    if (this.defaults.project == project)
-      return;
-
-    await this.init(this.baseDir);
-    await this.data.update(this.id_defaults, this.defaults);
-    await this.dispose();
+  // { project: abc, module: def }
+  async setConfig(options) {
+    return await this.configController.save(options);
   }
 }
 

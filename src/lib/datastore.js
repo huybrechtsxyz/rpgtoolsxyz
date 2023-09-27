@@ -1,18 +1,15 @@
 'use-strict';
 
-import path from 'path';
 import { Level } from 'level';
 import { error } from 'console';
 
-class Data {
+class Datastore {
   db
   name;
-  location;
   
-  constructor(baseDir, dbname) {
+  constructor(baseDir, dbname, valueEncoding = { valueEncoding: 'json' }) {
     this.name = dbname;
-    this.location = path.join(baseDir, dbname);
-    this.db = new Level(this.location, { valueEncoding: 'json' });
+    this.db = new Level(baseDir + '/' + dbname, valueEncoding);
   }
 
   async open() {
@@ -28,7 +25,7 @@ class Data {
   async close() {
     try {
       await this.db.close();
-      return !this.isOpen();
+      return true;
     }
     catch(error) {
       throw error;
@@ -39,11 +36,11 @@ class Data {
     if(this.db)
       return (this.db.status == 'open');
     else
-     return false;
+      return false;
   }
 
   async findOne(key) {
-    if (!this.isOpen)
+    if (!this.isOpen())
       throw error(`Collection ${this.name} is not initialized`);
     try {
       return await this.db.get(key);
@@ -55,13 +52,12 @@ class Data {
     }
   }
 
-  async findMany(filter) {
-    let values = await this.db.values(filter).all(); //filter = {} > All without limit
-    return values;
+  async findAll() {
+    return await this.db.values({}).all(); //filter = {} > All without limit
   }
 
   async create(key, value) {
-    if (!this.isOpen)
+    if (!this.isOpen())
       throw error(`Collection ${this.name} is not initialized`);
     let item = await this.findOne(key);
     if (item)
@@ -70,8 +66,8 @@ class Data {
     return value;
   }
 
-  async update(key, value) {
-    if (!this.isOpen)
+  async modify(key, value) {
+    if (!this.isOpen())
       throw error(`Collection ${this.name} is not initialized`);
     let item = await this.findOne(key);
     if (item) {
@@ -81,8 +77,15 @@ class Data {
     return null;
   }
 
+  async update(key, value) {
+    if (!this.isOpen())
+      throw error(`Collection ${this.name} is not initialized`);
+    await this.db.put(key, value);
+    return value;
+  }
+
   async remove(key) {
-    if (!this.isOpen)
+    if (!this.isOpen())
       throw error(`Collection ${this.name} is not initialized`);
     let item = await this.findOne(key);
     if (item) {
@@ -93,4 +96,4 @@ class Data {
   }
 }
 
-export default Data;
+export default Datastore;

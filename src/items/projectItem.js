@@ -1,11 +1,13 @@
 'use strict';
 
 class projectItem {
-  constructor(name = '', path = '') {
-    this.name = name;
-    this.path = path;
+  constructor(project = '', folder = '') {
+    this.name = project;
+    this.path = folder;
   }
 
+  get key() { return this.name; }
+  
   name;
   path;
 }

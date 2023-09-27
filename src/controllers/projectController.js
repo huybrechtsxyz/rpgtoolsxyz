@@ -5,142 +5,65 @@ import path from 'path';
 
 import CONFIG from '../config.js';
 import projectItem from '../items/projectItem.js';
-import projectData from '../data/projectData.js';
-
 import { createDirectory, cloneDirectories } from "../lib/filesystem.js";
 
 class projectController {
-  location;
-  items;
+  datastore;
 
-  constructor(baseDir) {
-    this.location = baseDir;
-    this.items = new projectData(this.location);
+  constructor(datastore) {
+    this.datastore = datastore;
   }
 
-  async init() {
-    await this.items.init();
+  async initialize() {
+    await this.datastore.open();
   }
-
+  
   async dispose() {
-    if (this.items)
-      this.items.dispose();
-  }
-
-  async create(name, options) {
-    console.log('Creating project ' + name + ' with template ' + options.template);
-    let template = path.resolve(path.join(this.location, 'assets', options.template));
-    let target = path.resolve(options.folder);
-    if (!fs.existsSync(template))
-      throw error(`Invalid template for ${template}`);
-    if (!fs.existsSync(target))
-      throw error(`Invalid target for ${target}`);
-
-    target = path.resolve(path.join(target, name));
-    console.log(' - creating default project folders and files...');
-    console.log(' - template: ' + template);
-    console.log(' - target: ' + target);
-    createDirectory(target);
-    cloneDirectories(template, target);
-
-    console.log(' - adding to project collection');
-    await this.init();
-    try {
-      let value = await this.items.create(new projectItem(name, target));
-      if (value) {
-        CONFIG.setProject(value.name);
-        for (var member in value) {
-          if (!value.hasOwnProperty(member) || typeof(value[member]) === "function") continue;
-          console.log(` - ${member}: ${value[member]}`);
-        }
-      } else
-        console.log(` - WARNING: Project ${name} already exists!`);
-    }
-    catch(error) {
-      console.log(` - ERROR: ${error}`);
-    }
-    await this.dispose();
-  }
-
-  async add(name, options) {
-    let target = path.resolve(options.folder);
-    console.log(`Adding project ${name}`);
-    if (!fs.existsSync(target))
-      throw error(`Invalid target for ${target}`);
-    console.log(' - adding to collection');
-    await this.init();
-    let value = await this.items.create(new projectItem(name, target));
-    if (value) {
-      CONFIG.setProject(value.name);
-      for (var member in value) {
-        if (!value.hasOwnProperty(member) || typeof(value[member]) === "function") continue;
-        console.log(` - ${member}: ${value[member]}`);
-      }
-    } else
-      console.log(` - WARNING: Project ${name} already exists!`);
-    await this.dispose;
-  }
-
-  async update(name, options) {
-    let value = new projectItem(name, path.resolve(options.folder));
-    console.log('Updating project ' + value.name);
-    if (!fs.existsSync(value.path))
-      throw error(`Invalid target for ${value.path}`);
-    console.log(' - updating project collection');
-    console.log(' - target: ' + value.path);
-    await this.init();
-    value = await this.items.update(value);
-    if (value) {
-      CONFIG.setProject(name);
-      for (var member in value) {
-        if (!value.hasOwnProperty(member) || typeof(value[member]) === "function") continue;
-        console.log(` - ${member}: ${value[member]}`);
-      }
-    } else
-      console.log(` - WARNING: Project ${name} does not exists!`);
-    await this.dispose();
-  }
-
-  async remove(name) {
-    console.log('Removing project ' + name);
-    console.log(' - Removing project collection');
-    await this.init();
-    let result = await this.items.remove( new projectItem(name, ''));
-    if (result) {
-      CONFIG.setProject(null);
-      console.log(' - Removed from collecion');
-    }
-    await this.dispose();
+    await this.datastore.close();
   }
 
   async list() {
-    console.log(`Retrieving projects`);
-    console.log(' - searching collection');
-    await this.init();
-    let values = await this.items.findMany({});
-    if (values && values.length>0) {
-      for (var item in values) {
-        console.log(` - ${values[item].name} \t\t (${values[item].path})`);
-      }
-    } else 
-      console.log(` - No projects where found`);
-    await this.dispose();
+    return await this.datastore.findAll();
+  }
+ 
+  async get(key) {
+    return await this.datastore.findOne(key);
   }
 
-  async get(name) {
-    console.log(`Retrieving project ${name}`);
-    console.log(' - searching collection');
-    await this.init();
-    let value = await this.items.findOne(name);
-    if (value) {
-      CONFIG.setProject(value.name);
-      for (var member in value) {
-        if (!value.hasOwnProperty(member) || typeof(value[member]) === "function") continue;
-        console.log(` - ${member}: ${value[member]}`);
+  validate(name, options, makeFolder = false) {
+    if (options) {
+      if (options.template) {
+        options.template = path.resolve(path.join(CONFIG.applicationPath, 'assets', 'projects', options.template));
+        if (!fs.existsSync(options.template))
+          throw error(`Invalid project template for ${options.template}`);
       }
-    } else
-      console.log(` - WARNING: Project ${name} not found`);
-    await this.dispose();
+      if (options.folder) {
+        options.folder = path.resolve(options.folder);
+        if (!fs.existsSync(options.folder))
+          throw error(`Invalid target for ${options.folder}`);
+        if (makeFolder)
+          options.folder = path.resolve(path.join(options.folder, name));
+      }
+    }
+    return options;
+  }
+
+  async create(name, options, makeFolder = false) {
+    if (makeFolder) {
+      createDirectory(options.folder);
+      cloneDirectories(options.template, options.folder);
+    }
+    let item = new projectItem(name, options.folder);
+    return await this.datastore.create(item.key, item);
+  }
+
+  async update(name, options) {
+    let item = new projectItem(name, options.folder);
+    return item = await this.datastore.modify(item.key, item);
+  }
+
+  async remove(name) {
+    return await this.datastore.remove(new projectItem(name).key);
   }
 }
 

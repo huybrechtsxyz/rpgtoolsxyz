@@ -1,55 +1,128 @@
 'use strict';
 
-import projectController from '../controllers/projectController.js';
+import CONFIG from '../config.js';
 
 class projectCommands {
   controller;
-
-  constructor(commands, baseDir, cwdPath) {
-    this.controller = new projectController(baseDir)
-    this.load(commands, cwdPath);
+  
+  constructor(commands) {
+    this.controller = CONFIG.projectController;
+    this.load(commands);
   }
 
-  load(commands, cwdPath) {
+  load(commands) {
     const cmdList = (commands['list']).command('project');
     cmdList
-      .description('Lists the current projects')
-      .action(() => { this.controller.list(); });
+      .description('List the known projects')
+      .action( async () => { await this.list(); });
 
     const cmdGet = (commands['get']).command('project');
     cmdGet
-      .argument('<project>', 'Name for the project.')
-      .description('Get the information about the project')
-      .action((project) => { this.controller.get(project); });
+      .argument('<project>', 'Name of the project')
+      .description('Display project information')
+      .action( async (project) => { await this.get(project); });
 
     const cmdNew = (commands['new']).command('project');
     cmdNew
-      .argument('<project>', 'Name for the project.')
-      .option('-f, --folder <target>', 'Path where to create the project', cwdPath)
-      .option('-t, --template <template>', 'Template for creating project', 'new-project')
-      .description('Create a new project in the given path\project')
-      .action( (project, options) => { this.controller.create(project, options); });
+      .argument('<project>', 'Name of the project')
+      .option('-f, --folder <target>', 'Selected parent path', CONFIG.currentWorkPath)
+      .option('-t, --template <template>', 'Selected template', 'new-project')
+      .description('Creates a new project')
+      .action( async (project, options) => { await this.create(project, options); });
 
     const cmdAdd = (commands['add']).command('project');
     cmdAdd
-      .argument('<project>', 'Name for the project.')
-      .option('-f, --folder <target>', 'Path where to create the project', cwdPath)
-      .description('Add an existing project with the given path')
-      .action((project, options) => { this.controller.add(project, options) });
-
+      .argument('<project>', 'Name of the project')
+      .option('-f, --folder <target>', 'Selected project path', CONFIG.currentWorkPath)
+      .description('Add an existing project to the collection')
+      .action( async (project, options) => { await this.add(project, options); });
+    
     const cmdSet = (commands['set']).command('project');
     cmdSet
-      .argument('<project>', 'Name for the project.')
-      .option('-f, --folder <target>', 'Path of the project', cwdPath)
-      .description('Updates the information of a project')
-      .action((project, options) => { this.controller.update(project, options); });
+      .argument('<project>', 'Name of the project')
+      .option('-f, --folder <target>', 'Selected project path', CONFIG.currentWorkPath)
+      .description('Update project information')
+      .action( async (project, options) => { await this.set(project, options); });
 
     const cmdDel = (commands['del']).command('project');
     cmdDel
-      .argument('<project>', 'Name for the project.')
-      .description('Removes the project from the collection but does not delete any files or folders.')
-      .action((project) => { this.controller.remove(project); });
+      .argument('<project>', 'Name of the project')
+      .description('Removes the project from the collection')
+      .action( async (project) => { await this.remove(project); });
+  }
+
+  async list() {
+    console.log(`Retrieving projects from collection`);
+    let values = await this.controller.list();
+    this.printList(values);
+  }
+
+  async get(project) {
+    console.log(`Retrieving project ${project} from collection`);
+    let value = await this.controller.get(project);
+    if (value)
+      await CONFIG.setConfig({ project: value.name });
+    this.printValues(value, ` - WARNING: Project ${project} not found`);
+  }
+
+  async create(project, options) {
+    console.log('Creating project ' + project + ' with template ' + options.template);
+    options = this.controller.validate(project, options, true);
+    console.log(' - template: ' + options.template);
+    console.log(' - target: ' + options.folder);
+    let value = await this.controller.create(project, options, true);
+    if (value)
+      await CONFIG.setConfig({ project: value.name });
+    this.printValues(value, ` - WARNING: Project ${project} already exists`);
+  }  
+
+  async add(project, options) {
+    console.log(`Adding project ${project} to collection`);
+    options = this.controller.validate(project, options, false);
+    console.log(' - target: ' + options.folder);
+    let value = await this.controller.create(project, options, false);
+    if (value)
+      await CONFIG.setConfig({ project: value.name });
+    this.printValues(value, ` - WARNING: Project ${project} already exists`);
+  }
+
+  async set(project, options) {
+    console.log(`Updating project ${project} in collection`);
+    options = this.controller.validate(project, options, false);
+    let value = await this.controller.update(project, options);
+    if (value)
+      await CONFIG.setConfig({ project: value.name });
+    this.printValues(value, ` - WARNING: Project ${project} does not exists`);
+  }
+
+  async remove(project) {
+    console.log('Removing project ' + project + ' from collection');
+    let value = await this.controller.remove(project);
+    if (value) {
+      await CONFIG.setConfig({ project: '' });
+      console.log(' - Project is removed from the collection');
+    } else
+      console.log(` - WARNING: Project ${project} does not exists`);
+  }
+
+  printList(values) {
+    if (values && values.length>0) {
+      for (var item in values) {
+        console.log(` - ${values[item].name} \t\t (${values[item].path})`);
+      }
+    } else 
+      console.log(` - No projects where found`);
+  }
+
+  printValues(value, warning) {
+    if (value) {
+      for (var member in value) {
+        if (!value.hasOwnProperty(member) || typeof(value[member]) === "function") continue;
+        console.log(` - ${member}: ${value[member]}`);
+      }
+    } else
+      console.log(warning);
   }
 }
 
-export default projectCommands 
+export default projectCommands

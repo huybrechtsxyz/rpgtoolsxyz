@@ -8,7 +8,9 @@ import { Command } from 'commander';
 import CONFIG from './config.js';
 import { readJsonFile } from './lib/filesystem.js';
 
+import configCommands from './commands/configCommands.js';
 import projectCommands from './commands/projectCommands.js';
+import moduleCommands from './commands/moduleCommands.js';
 
 // Read Package
 const cwdPath = process.cwd();
@@ -22,7 +24,8 @@ console.log(' - App path: ' + appPath);
 console.log('');
 
 // Create command line interface
-await CONFIG.init(appPath);
+await CONFIG.initialize(appPath, cwdPath);
+
 const program = new Command();
 program
   .name(packageData.name)
@@ -38,10 +41,12 @@ let commands = {
 };
 
 let subcommands = {
-  project: new projectCommands(commands, appPath, cwdPath)
+  config: new configCommands(commands),
+  project: new projectCommands(commands, appPath, cwdPath),
+  module: new moduleCommands(commands, appPath, cwdPath)
 }
 
 // Parse and execute commandline.
-program.parse(process.argv)
+await program.parseAsync(process.argv)
 console.log('');
 await CONFIG.dispose();
