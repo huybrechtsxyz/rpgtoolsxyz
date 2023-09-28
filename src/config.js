@@ -10,6 +10,12 @@ const CONFIG = {
   projectDB: 'data/projects.db',
   moduleDB: 'data/modules.db',
 
+  assetsPath: 'assets',
+  buildPath: 'bin',
+  outputPath: 'dist',
+  modulePath: 'mods',
+  moduleFile: 'module.yaml',
+
   applicationPath: null,
   currentWorkPath: null,
   configController: null,

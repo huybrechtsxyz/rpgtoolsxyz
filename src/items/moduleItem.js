@@ -12,6 +12,8 @@ class moduleItem {
 
   project;
   name;
+  vtt;
+  path;
 }
 
 export default moduleItem;

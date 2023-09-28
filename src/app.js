@@ -38,7 +38,7 @@ let commands = {
   list: program.command('list'),
   get: program.command('get'),
   set: program.command('set'),
-  sync: program.command('sync')
+  build: program.command('build')
 };
 
 let subcommands = {
@@ -48,6 +48,17 @@ let subcommands = {
 }
 
 // Parse and execute commandline.
+/*
+ * -h : help
+ * -p : project
+ * -m : module
+ * -r : resource
+ * -t : template
+ * -f : folder/path
+ * -v : version: major, minor, build
+ * -vtt : vtt: foundry
+*/
+
 await program.parseAsync(process.argv)
 console.log('');
 await CONFIG.dispose();

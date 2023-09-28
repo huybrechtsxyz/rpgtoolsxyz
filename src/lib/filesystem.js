@@ -4,7 +4,22 @@ import fs from 'fs';
 import fsp from 'fs/promises';
 import path from 'path';
 import yaml from 'js-yaml';
+import JSZip from 'jszip';
+import FileSaver from 'file-saver';
 import { error } from 'console';
+
+/**
+ * Saves a folder as zip. Use fullpaths!
+ * @param {string} pathToZip 
+ * @param {string} saveAsFile 
+ */
+export async function zipFolder(pathToZip, saveAsFile) {
+  const zip = new JSZip();
+  zip.folder(pathToZip);
+  await zip.generateAsync({type:"blob"}).then(function(content) {
+    FileSaver.saveAs(content, saveAsFile + ".zip");
+  });
+}
 
 /**
  * @param {fs.PathLike} folder
@@ -17,6 +32,21 @@ export function createDirectory(folder) {
 }
 
 /**
+ * 
+ * @param {source file} source 
+ * @param {target file} target 
+ * @param {boolean} overwrite target
+ * @returns void
+ */
+export function copyFile(source, target, overwrite = false) {
+  if (!fs.existsSync(source))
+    throw error('   ! Invalid source path defined');
+  if (fs.existsSync(source)) { if (!overwrite) return; }
+  fs.copyFileSync(asset, file);
+}
+
+/**
+ *
  * @param {string} source
  * @param {string} target
  */

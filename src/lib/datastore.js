@@ -7,11 +7,21 @@ class Datastore {
   db
   name;
   
+  /**
+   * 
+   * @param {string} baseDir 
+   * @param {string} dbname 
+   * @param {JSON} valueEncoding 
+   */
   constructor(baseDir, dbname, valueEncoding = { valueEncoding: 'json' }) {
     this.name = dbname;
     this.db = new Level(baseDir + '/' + dbname, valueEncoding);
   }
 
+  /**
+   * 
+   * @returns bool if opened
+   */
   async open() {
     try {
       await this.db.open();
@@ -22,6 +32,10 @@ class Datastore {
     }
   }
 
+  /**
+   * 
+   * @returns bool if closed
+   */
   async close() {
     try {
       await this.db.close();
@@ -32,6 +46,10 @@ class Datastore {
     }
   }
 
+  /**
+   * 
+   * @returns bool if database is open
+   */
   isOpen() {
     if(this.db)
       return (this.db.status == 'open');
@@ -39,6 +57,11 @@ class Datastore {
       return false;
   }
 
+  /**
+   * 
+   * @param {string} key 
+   * @returns object
+   */
   async findOne(key) {
     if (!this.isOpen())
       throw error(`Collection ${this.name} is not initialized`);
@@ -52,10 +75,20 @@ class Datastore {
     }
   }
 
+  /**
+   * 
+   * @returns all values of the database
+   */
   async findAll() {
     return await this.db.values({}).all(); //filter = {} > All without limit
   }
 
+  /**
+   * 
+   * @param {string} key 
+   * @param {JSON} value 
+   * @returns the newly created object or null if already exists
+   */
   async create(key, value) {
     if (!this.isOpen())
       throw error(`Collection ${this.name} is not initialized`);
@@ -66,6 +99,12 @@ class Datastore {
     return value;
   }
 
+  /**
+   * 
+   * @param {string} key 
+   * @param {object} value 
+   * @returns the modified object or null if key not found
+   */
   async modify(key, value) {
     if (!this.isOpen())
       throw error(`Collection ${this.name} is not initialized`);
@@ -77,6 +116,12 @@ class Datastore {
     return null;
   }
 
+  /**
+   * 
+   * @param {string} key 
+   * @param {object} value 
+   * @returns the created or updated object
+   */
   async update(key, value) {
     if (!this.isOpen())
       throw error(`Collection ${this.name} is not initialized`);
@@ -84,6 +129,11 @@ class Datastore {
     return value;
   }
 
+  /**
+   * 
+   * @param {string} key 
+   * @returns if object was deleted or false if not found
+   */
   async remove(key) {
     if (!this.isOpen())
       throw error(`Collection ${this.name} is not initialized`);

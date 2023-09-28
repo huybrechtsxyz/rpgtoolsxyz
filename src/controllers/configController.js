@@ -9,23 +9,35 @@ import moduleItem from "../items/moduleItem.js";
 class configController {
   datastore;
 
+  /**
+   * @param {datastore} datastore
+   */
   constructor(datastore) {
     this.datastore = datastore;
   }
 
+  /**
+   */
   async initialize() {
     await this.datastore.open();
   }
   
+  /**
+   */
   async dispose() {
     await this.datastore.close();
   }
 
+  /**
+   */
   async read() {
     return await this.datastore.findOne(new configItem().key);
   }
 
-  
+  /**
+   * @param {string} project 
+   * @param {array} options    
+   */
   async validateModule(project, options) {
     if (options.module) {
       let module = await CONFIG.moduleController.get(new moduleItem(project.name, options.module).key);
@@ -36,6 +48,10 @@ class configController {
     return null;
   }
 
+  /**
+   * @param {array} options    
+   * @param {boolean} [doThrow=false] 
+   */
   async save(options, doThrow = false) {
     let item = await this.datastore.findOne(new configItem().key);
     let value = new configItem();

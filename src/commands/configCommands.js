@@ -5,11 +5,17 @@ import CONFIG from '../config.js';
 class configCommands {
   controller;
   
+  /**
+   * @param {command} commands 
+   */
   constructor(commands) {
     this.controller = CONFIG.configController;
     this.load(commands);
   }
 
+  /**
+   * @param {command} commands 
+   */
   load(commands) {
     const cmdGet = (commands['get']).command('config');
     cmdGet
@@ -24,6 +30,8 @@ class configCommands {
       .action( async (options) => { await this.set(options); });
   }
 
+  /**
+   */
   async get() {
     console.log(`Retrieving default configuration`);
     let value = await this.controller.read();
@@ -36,6 +44,9 @@ class configCommands {
       console.log(` - WARNING: Defaults not found`); 
   }
 
+  /**
+   * @param {Array} options 
+   */
   async set(options) {
     console.log(`Storing default configuration`);
     if (options && Object.keys(options).length>0) {

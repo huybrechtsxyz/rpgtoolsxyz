@@ -5,11 +5,17 @@ import CONFIG from '../config.js';
 class projectCommands {
   controller;
   
+  /**
+   * @param {commands} commands 
+   */
   constructor(commands) {
     this.controller = CONFIG.projectController;
     this.load(commands);
   }
 
+  /**
+   * @param {commands} commands 
+   */
   load(commands) {
     const cmdList = (commands['list']).command('project');
     cmdList
@@ -51,12 +57,17 @@ class projectCommands {
       .action( async (project) => { await this.remove(project); });
   }
 
+  /**
+   */
   async list() {
     console.log(`Retrieving projects from collection`);
     let values = await this.controller.list();
     this.printList(values);
   }
 
+  /**
+   * @param {string} project 
+   */
   async get(project) {
     console.log(`Retrieving project ${project} from collection`);
     let value = await this.controller.get(project);
@@ -65,6 +76,10 @@ class projectCommands {
     this.printValues(value, ` - WARNING: Project ${project} not found`);
   }
 
+  /**
+   * @param {string} project 
+   * @param {array} options 
+   */
   async create(project, options) {
     console.log('Creating project ' + project + ' with template ' + options.template);
     options = this.controller.validate(project, options, true);
@@ -76,6 +91,10 @@ class projectCommands {
     this.printValues(value, ` - WARNING: Project ${project} already exists`);
   }  
 
+  /**
+   * @param {string} project 
+   * @param {array} options 
+   */
   async add(project, options) {
     console.log(`Adding project ${project} to collection`);
     options = this.controller.validate(project, options, false);
@@ -86,6 +105,10 @@ class projectCommands {
     this.printValues(value, ` - WARNING: Project ${project} already exists`);
   }
 
+  /**
+   * @param {string} project 
+   * @param {array} options 
+   */
   async set(project, options) {
     console.log(`Updating project ${project} in collection`);
     options = this.controller.validate(project, options, false);
@@ -95,6 +118,10 @@ class projectCommands {
     this.printValues(value, ` - WARNING: Project ${project} does not exists`);
   }
 
+  /**
+   * @param {string} project 
+   * @param {array} options 
+   */
   async remove(project) {
     console.log('Removing project ' + project + ' from collection');
     let value = await this.controller.remove(project);
@@ -105,6 +132,9 @@ class projectCommands {
       console.log(` - WARNING: Project ${project} does not exists`);
   }
 
+  /**
+   * @param {array} values
+   */
   printList(values) {
     if (values && values.length>0) {
       for (var item in values) {
@@ -114,6 +144,10 @@ class projectCommands {
       console.log(` - No projects where found`);
   }
 
+  /**
+   * @param {array} value
+   * @param {string} warning 
+   */
   printValues(value, warning) {
     if (value) {
       for (var member in value) {
