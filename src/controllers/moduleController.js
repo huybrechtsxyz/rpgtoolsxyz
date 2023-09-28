@@ -97,6 +97,13 @@ class moduleController {
     return await this.datastore.remove(item.key);
   }
 
+  async removeMany(options) {
+    let values = await this.list(options);
+    for (var member in values) {
+      await this.datastore.remove(member.key);
+    }
+  }
+
   async applyFilter(queryObj, project) {
     if (project)
       return queryObj.where(function(element) { return element.project == project; }).toList();

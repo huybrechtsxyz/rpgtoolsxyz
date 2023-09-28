@@ -63,7 +63,10 @@ class projectController {
   }
 
   async remove(name) {
-    return await this.datastore.remove(new projectItem(name).key);
+    let deleted = await this.datastore.remove(new projectItem(name).key);
+    if (deleted) {
+      await CONFIG.moduleController.removeMany({ project: name });
+    }
   }
 }
 
