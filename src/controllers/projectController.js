@@ -5,6 +5,7 @@ import path from 'path';
 
 import CONFIG from '../config.js';
 import projectItem from '../items/projectItem.js';
+import projectBuilder from '../builders/projectBuilder.js';
 import { createDirectory, cloneDirectories } from "../lib/filesystem.js";
 
 class projectController {
@@ -96,6 +97,21 @@ class projectController {
     if (deleted) {
       await CONFIG.moduleController.removeMany({ project: name });
     }
+  }
+
+  /**
+  * @param {string} name 
+  * @param {array} options 
+  */
+  async build(name, options) {
+    let project = await CONFIG.projectController.get(new projectItem(options.project).key);
+    if (!project)
+      throw error(`Invalid project ${options.project} selected`);
+    
+    console.log(` - Building project ...`);
+    let builder = new projectBuilder(project, options);
+    await builder.build();
+    console.log(` - Building project ...finished`);
   }
 }
 

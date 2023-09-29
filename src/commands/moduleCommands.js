@@ -158,7 +158,7 @@ class moduleCommands {
    */
   async build(module, options) {
     module = await this.controller.getModuleName(module);
-    console.log('Syncrhonizing module ' + module + ' from collection');
+    console.log('Building module ' + module + ' from collection');
     options = await this.controller.validate(module, options, false);
     let value = await this.controller.build(module, options);
     if (value)

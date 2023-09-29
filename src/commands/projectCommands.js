@@ -55,6 +55,13 @@ class projectCommands {
       .argument('<project>', 'Name of the project')
       .description('Removes the project from the collection')
       .action( async (project) => { await this.remove(project); });
+
+    const cmdBuild = (commands['build']).command('[project]');
+    cmdBuild
+      .argument('<project>', 'Name of the project')
+      .addOption(new Option('-v, --version <version>', 'Increment module version').choices(['build', 'minor', 'major']))
+      .description('Builds the project information')
+      .action( async (project, options) => { await this.build(project, options); });
   }
 
   /**
@@ -151,6 +158,18 @@ class projectCommands {
       console.log(' - Project is removed from the collection');
     } else
       console.log(` - WARNING: Project ${project} does not exists`);
+  }
+
+  /**
+   * @param {string} module 
+   * @param {Array} options 
+   */
+  async build(project, options) {
+    console.log('Building project ' + project + ' from collection');
+    let value = await this.controller.build(project, options);
+    if (value)
+      await CONFIG.setConfig({ project: value.name });
+    this.printValues(value, ` - WARNING: Project ${project} does not exists`);
   }
 
   /**

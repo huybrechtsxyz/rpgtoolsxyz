@@ -209,7 +209,7 @@ class moduleController {
         module.path = options.location;       
       } else {
         module.vtt = null;
-        module.location = null;
+        module.path = null;
       }
     }
     return module;

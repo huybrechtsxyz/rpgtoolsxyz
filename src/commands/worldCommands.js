@@ -158,7 +158,7 @@ class worldCommands {
    */
   async build(world, options) {
     world = await this.controller.getworldName(world);
-    console.log('Syncrhonizing world ' + world + ' from collection');
+    console.log('Building world ' + world + ' from collection');
     options = await this.controller.validate(world, options, false);
     let value = await this.controller.build(world, options);
     if (value)

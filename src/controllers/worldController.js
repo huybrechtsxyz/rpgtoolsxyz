@@ -209,7 +209,7 @@ class worldController {
         world.path = options.location;       
       } else {
         world.vtt = null;
-        world.location = null;
+        world.path = null;
       }
     }
     return world;
