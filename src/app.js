@@ -11,6 +11,7 @@ import { readJsonFile } from './lib/filesystem.js';
 import configCommands from './commands/configCommands.js';
 import projectCommands from './commands/projectCommands.js';
 import moduleCommands from './commands/moduleCommands.js';
+import worldCommands from './commands/worldCommands.js';
 
 // Read Package
 const cwdPath = process.cwd();
@@ -44,7 +45,8 @@ let commands = {
 let subcommands = {
   config: new configCommands(commands),
   project: new projectCommands(commands, appPath, cwdPath),
-  module: new moduleCommands(commands, appPath, cwdPath)
+  module: new moduleCommands(commands, appPath, cwdPath),
+  world: new worldCommands(commands, appPath, cwdPath)
 }
 
 // Parse and execute commandline.
@@ -52,6 +54,7 @@ let subcommands = {
  * -h : help
  * -p : project
  * -m : module
+ * -w : world
  * -r : resource
  * -t : template
  * -f : folder/path

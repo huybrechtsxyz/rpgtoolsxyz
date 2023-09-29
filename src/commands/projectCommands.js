@@ -1,7 +1,6 @@
 'use strict';
 
 import CONFIG from '../config.js';
-import moduleCommands from './moduleCommands.js';
 
 class projectCommands {
   controller;
@@ -77,12 +76,22 @@ class projectCommands {
     }
     this.printValues(value, ` - WARNING: Project ${project} not found`);
     if (value) {
-      let values = await CONFIG.moduleController.list({project: project});
-      if (values && values.length > 0) {
+      // MODULES
+      let modules = await CONFIG.moduleController.list({project: project});
+      if (modules && modules.length > 0) {
         console.log(` - modules`);
-        for (var member in values) {
-          if (!values.hasOwnProperty(member) || typeof(values[member]) === "function") continue;
-          console.log(`    - ${values[member].name}`);
+        for (var member in modules) {
+          if (!modules.hasOwnProperty(member) || typeof(modules[member]) === "function") continue;
+          console.log(`    - ${modules[member].name}`);
+        }
+      }
+      // WORLDS
+      let worlds = await CONFIG.worldController.list({project: project});
+      if (worlds && worlds.length > 0) {
+        console.log(` - worlds`);
+        for (var member in worlds) {
+          if (!worlds.hasOwnProperty(member) || typeof(worlds[member]) === "function") continue;
+          console.log(`    - ${worlds[member].name}`);
         }
       }
     }

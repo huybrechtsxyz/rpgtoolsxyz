@@ -66,8 +66,8 @@ class moduleCommands {
       .description('Removes the module from the project')
       .action( async (module, options) => { await this.remove(module, options); });
 
-    const cmdSync = (commands['build']).command('module');
-    cmdSync
+    const cmdBuild = (commands['build']).command('module');
+    cmdBuild
       .argument('[module]', 'Name of the module')
       .option('-p, --project <project>', 'Selected project')
       .addOption(new Option('-v, --version <version>', 'Increment module version').choices(['build', 'minor', 'major']))
@@ -120,7 +120,6 @@ class moduleCommands {
   async add(module, options) {
     console.log('Adding module ' + module + ' to collection');
     options = await this.controller.validate(module, options, false);
-    console.log(' - project: ' + options.project);
     console.log(' - target: ' + options.folder);
     let value = await this.controller.create(module, options, false);
     if (value)

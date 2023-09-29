@@ -6,12 +6,12 @@ import jslinq from 'jslinq';
 
 import CONFIG from '../config.js';
 import projectItem from '../items/projectItem.js';
-import moduleItem from '../items/moduleItem.js';
-import moduleBuilder from '../builders/moduleBuilder.js';
+import worldItem from '../items/worldItem.js';
+//import worldBuilder from '../builders/worldBuilder.js';
 import { createDirectory, cloneDirectories } from "../lib/filesystem.js";
 import { error } from 'console';
 
-class moduleController {
+class worldController {
   datastore;
 
   /**
@@ -53,7 +53,7 @@ class moduleController {
    */
   async get(name, options) {
     let project = await this.getProjectName(options);
-    let item = new moduleItem(project, name);
+    let item = new worldItem(project, name);
     return await this.datastore.findOne(item.key);
   }
 
@@ -72,20 +72,20 @@ class moduleController {
       throw error(`Invalid project ${options.project} selected`);
 
     if (options && options.template) {
-      options.template = path.resolve(path.join(CONFIG.applicationPath, 'assets', 'modules', options.template));
+      options.template = path.resolve(path.join(CONFIG.applicationPath, 'assets', 'worlds', options.template));
       if (!fs.existsSync(options.template))
-        throw error(`Invalid module template for ${options.template}`);
+        throw error(`Invalid world template for ${options.template}`);
     }
 
     if (!fs.existsSync(project.path))
       throw error(`Invalid project ${project.name} target for ${project.path}`);
 
-    options.folder = path.resolve(path.join(project.path, CONFIG.modulePath));
+    options.folder = path.resolve(path.join(project.path, CONFIG.worldPath));
     if (!fs.existsSync(options.folder)) {
       if (makeFolder)
         createDirectory(options.folder);
       else
-        throw error(`Invalid module ${name} folder for ${options.folder}`);
+        throw error(`Invalid world ${name} folder for ${options.folder}`);
     }
 
     options.folder = path.join(options.folder, name);
@@ -93,7 +93,7 @@ class moduleController {
       if (makeFolder)
         createDirectory(options.folder);
       else 
-        throw error(`Invalid module ${name} target for ${options.folder}`);
+        throw error(`Invalid world ${name} target for ${options.folder}`);
     }
 
     return options;
@@ -109,8 +109,8 @@ class moduleController {
       createDirectory(options.folder);
       cloneDirectories(options.template, options.folder);
     } 
-    let item = new moduleItem(options.project, name);
-    item = this.setModuleFields(item, options);
+    let item = new worldItem(options.project, name);
+    item = this.setworldFields(item, options);
     return await this.datastore.create(item.key, item);
   }
 
@@ -119,8 +119,8 @@ class moduleController {
    * @param {array} options 
    */
   async update(name, options) {
-    let item = new moduleItem(options.project, name);
-    item = this.setModuleFields(item, options);
+    let item = new worldItem(options.project, name);
+    item = this.setworldFields(item, options);
     return await this.datastore.update(item.key, item);
   }
 
@@ -129,7 +129,7 @@ class moduleController {
    * @param {array} options 
    */
   async remove(name, options) {
-    let item = new moduleItem(options.project, name);
+    let item = new worldItem(options.project, name);
     return await this.datastore.remove(item.key);
   }
 
@@ -151,14 +151,14 @@ class moduleController {
     let project = await CONFIG.projectController.get(new projectItem(options.project).key);
     if (!project)
       throw error(`Invalid project ${options.project} selected`);
-    let module = await this.datastore.findOne(new moduleItem(project.name, name).key);
-    if (!module)
-      throw error(`Invalid module ${name} for project ${options.project}`);
+    let world = await this.datastore.findOne(new worldItem(project.name, name).key);
+    if (!world)
+      throw error(`Invalid world ${name} for project ${options.project}`);
 
-    console.log(` - Building module ...`);
-    let builder = new moduleBuilder(project, module, options);
-    await builder.build();
-    console.log(` - Building module ...finished`);
+    console.log(` - Building world ...`);
+    //let builder = new worldBuilder(project, world, options);
+    //await builder.build();
+    console.log(` - Building world ...finished`);
   }
 
   /**
@@ -187,33 +187,33 @@ class moduleController {
   /**
    * @param {string} name 
    */
-  async getModuleName(name) {
+  async getworldName(name) {
     if (name && name != '')
       return name;
     let value = await CONFIG.getConfig();
-    if (value && value.module && value.module != '')
-      return value.module;
+    if (value && value.world && value.world != '')
+      return value.world;
     return null;
   }
 
   /**
    * 
-   * @param {moduleItem} module 
+   * @param {worldItem} world 
    * @param {array} options 
-   * @returns module
+   * @returns world
    */
-  setModuleFields(module, options) {
+  setworldFields(world, options) {
     if (options) {
       if (options.vtt) {
-        module.vtt = options.vtt;
-        module.path = options.location;       
+        world.vtt = options.vtt;
+        world.path = options.location;       
       } else {
-        module.vtt = null;
-        module.location = null;
+        world.vtt = null;
+        world.location = null;
       }
     }
-    return module;
+    return world;
   }
 }
 
-export default moduleController;
+export default worldController;

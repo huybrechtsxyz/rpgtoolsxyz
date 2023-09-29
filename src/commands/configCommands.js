@@ -26,6 +26,7 @@ class configCommands {
     cmdSet
       .option('-p, --project <project>', 'Selected project')
       .option('-m, --module <module>', 'Selected module')
+      .option('-w, --world <world>', 'Selected world')
       .description('Update the configuration')
       .action( async (options) => { await this.set(options); });
   }

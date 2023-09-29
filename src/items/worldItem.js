@@ -1,12 +1,12 @@
 'use strict';
 
-class moduleItem {
+class worldItem {
   constructor(project = '', name = '') {
     this.project = project;
     this.name = name;
   }
 
-  get key() { return { project: this.project, module: this.name }; };
+  get key() { return { project: this.project, world: this.name }; };
 
   project;
   name;
@@ -14,4 +14,4 @@ class moduleItem {
   path;
 }
 
-export default moduleItem;
+export default worldItem;

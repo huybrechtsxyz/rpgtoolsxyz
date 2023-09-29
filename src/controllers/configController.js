@@ -5,6 +5,7 @@ import CONFIG from "../config.js";
 import configItem from "../items/configItem.js";
 import projectItem from "../items/projectItem.js";
 import moduleItem from "../items/moduleItem.js";
+import worldItem from "../items/worldItem.js"
 
 class configController {
   datastore;
@@ -72,10 +73,19 @@ class configController {
     else
       value.module = null;
 
+    // Get world value from options or database
+    if (options && options.world && options.world != '')
+      value.world = options.world;
+    else if (item && item.world && item.world != '')
+      value.world = item.world;
+    else
+      value.world = null;
+
     // No project? Then no module. Save and exit.
     if (!value.project) {
       value.project = null;
       value.module = null;
+      value.world = null;
       await this.datastore.update(new configItem().key, value);
       return value;
     }
@@ -86,6 +96,7 @@ class configController {
       if (!project) {
         value.project = null;
         value.module = null;
+        value.world = null;
         await this.datastore.update(new configItem().key, value);
         if (doThrow)
           throw new error(`Invalid project ${value.project}`);
@@ -93,22 +104,23 @@ class configController {
       }
     }
     
-    // No module? Save and exit.
-    if (!value.module) {
-      value.module = null;
-      await this.datastore.update(new configItem().key, value);
-      return value;
-    }
-
-    // Module not found for project? Clear. Save and exit.
+    // Module?
     if (value.module) {
       let module = await CONFIG.moduleController.get(new moduleItem(value.project, value.module).key);
       if (!module) {
         value.module = null;
-        await this.datastore.update(new configItem().key, value);
         if (doThrow)
           throw new error(`Invalid module ${value.module} for project ${value.project}`);
-        return value;
+      }
+    }
+
+    // World?
+    if (value.world) {
+      let world = await CONFIG.worldController.get(new worldItem(value.project, value.world).key);
+      if (!world) {
+        value.world = null;
+        if (doThrow)
+          throw new error(`Invalid world ${value.world} for project ${value.project}`);
       }
     }
 
