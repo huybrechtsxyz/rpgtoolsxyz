@@ -106,7 +106,6 @@ class moduleCommands {
   async create(module, options) {
     console.log('Creating module ' + module + ' with template ' + options.template);
     options = await this.controller.validate(module, options, true);
-    console.log(' - project: ' + options.project);
     console.log(' - target: ' + options.folder);
     let value = await this.controller.create(module, options, true);
     if (value)

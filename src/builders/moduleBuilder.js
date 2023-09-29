@@ -67,7 +67,6 @@ class moduleBuilder {
     // Actions for VTT BEFORE
     if (this.builder)
       this.builder.beforeBuild(project,module,assetsPath,buildPath,outputPath,modulePath);
-      
     
     // Actions for VTT POST
     if (this.builder)

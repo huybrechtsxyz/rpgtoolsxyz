@@ -1,6 +1,7 @@
 'use strict';
 
 import CONFIG from '../config.js';
+import moduleCommands from './moduleCommands.js';
 
 class projectCommands {
   controller;
@@ -71,9 +72,20 @@ class projectCommands {
   async get(project) {
     console.log(`Retrieving project ${project} from collection`);
     let value = await this.controller.get(project);
-    if (value)
+    if (value) {
       await CONFIG.setConfig({ project: value.name });
+    }
     this.printValues(value, ` - WARNING: Project ${project} not found`);
+    if (value) {
+      let values = await CONFIG.moduleController.list({project: project});
+      if (values && values.length > 0) {
+        console.log(` - modules`);
+        for (var member in values) {
+          if (!values.hasOwnProperty(member) || typeof(values[member]) === "function") continue;
+          console.log(`    - ${values[member].name}`);
+        }
+      }
+    }
   }
 
   /**
