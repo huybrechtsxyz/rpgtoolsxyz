@@ -166,7 +166,6 @@ class moduleBuilderFoundry {
     if (fs.existsSync(source) && fs.existsSync(target)) {
       var sourceData = await readDataFile(source);
       var targetData = await readDataFile(target);
-      console.log('transform:' + '-' + output + '-' + path.extname(output).toLowerCase());
       transform(targetData, sourceData);
       writeDataFile(output, targetData);
     }
