@@ -1,7 +1,7 @@
 'use strict';
 
-import CONFIG from '../config.js';
 import { Option } from 'commander';
+import CONFIG from '../config.js';
 
 class moduleCommands {
   controller;

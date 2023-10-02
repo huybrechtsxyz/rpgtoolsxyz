@@ -1,5 +1,6 @@
 'use strict';
 
+import { Option } from 'commander';
 import CONFIG from '../config.js';
 
 class projectCommands {
@@ -56,7 +57,7 @@ class projectCommands {
       .description('Removes the project from the collection')
       .action( async (project) => { await this.remove(project); });
 
-    const cmdBuild = (commands['build']).command('[project]');
+    const cmdBuild = (commands['build']).command('project');
     cmdBuild
       .argument('<project>', 'Name of the project')
       .addOption(new Option('-v, --version <version>', 'Increment module version').choices(['build', 'minor', 'major']))

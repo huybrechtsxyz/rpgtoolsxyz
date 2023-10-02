@@ -104,14 +104,14 @@ class projectController {
   * @param {array} options 
   */
   async build(name, options) {
-    let project = await CONFIG.projectController.get(new projectItem(options.project).key);
+    let project = await CONFIG.projectController.get(new projectItem(name).key);
     if (!project)
-      throw error(`Invalid project ${options.project} selected`);
+      throw error(`Invalid project ${name} selected`);
     
     console.log(` - Building project ...`);
-    let builder = new projectBuilder(project, options);
+    let builder = new projectBuilder(name, options);
     await builder.build();
-    console.log(` - Building project ...finished`);
+    console.log(` - Building project ... finished`);
   }
 }
 

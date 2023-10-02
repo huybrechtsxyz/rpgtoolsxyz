@@ -155,10 +155,10 @@ class moduleController {
     if (!module)
       throw error(`Invalid module ${name} for project ${options.project}`);
 
-    console.log(` - Building module ...`);
+    console.log(` - Building module ... ${name}`);
     let builder = new moduleBuilder(project, module, options);
     await builder.build();
-    console.log(` - Building module ...finished`);
+    console.log(` - Building module ...${name} finished`);
   }
 
   /**

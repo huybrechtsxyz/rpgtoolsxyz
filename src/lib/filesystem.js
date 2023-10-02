@@ -5,7 +5,6 @@ import fsp from 'fs/promises';
 import path from 'path';
 import yaml from 'js-yaml';
 import JSZip from 'jszip';
-import FileSaver from 'file-saver';
 import { error } from 'console';
 
 /**
@@ -14,11 +13,42 @@ import { error } from 'console';
  * @param {string} saveAsFile 
  */
 export async function zipFolder(pathToZip, saveAsFile) {
-  const zip = new JSZip();
-  zip.folder(pathToZip);
-  await zip.generateAsync({type:"blob"}).then(function(content) {
-    FileSaver.saveAs(content, saveAsFile + ".zip");
+  let cwd = process.cwd();
+  process.chdir(pathToZip);
+  let zip = new JSZip();
+  zip = await addToZip('.', zip);
+  await zip.generateAsync({type:"blob"}).then(async function(content) {
+    let readableStream = content.stream();
+    let stream = readableStream.getReader();
+    let writestream = fs.createWriteStream(saveAsFile);
+    while (true) {
+      let { done, value } = await stream.read();
+      if (done) { break; }
+      writestream.write(value);
+    }
+    writestream.close();
   });
+  process.chdir(cwd);
+}
+
+async function addToZip(pathToZip, zip, recursive = true, indentation = '       ') {
+  if (!fs.existsSync(pathToZip))
+    throw error('   ! Invalid source path defined');
+  for(const item of fs.readdirSync(pathToZip)) {
+    var asset = path.join(pathToZip, item);
+    var stat = fs.statSync(asset);
+    if (stat.isDirectory() && recursive) {
+      //console.log(indentation + '/' + asset);
+      let zipped = zip.folder(asset);
+      await addToZip(asset, zipped, recursive, indentation + '   ');
+    }
+    else if (stat.isFile()) {
+      //console.log(indentation + '- ' + asset);
+      var content = fs.readFileSync(asset);
+      await zip.file(asset, content);
+    }
+  }
+  return zip;
 }
 
 /**
@@ -50,13 +80,13 @@ export function copyFile(source, target, overwrite = false) {
  * @param {string} source
  * @param {string} target
  */
-export function cloneDirectories(source, target) {
+export function cloneDirectories(source, target, recursive = true) {
   if (!fs.existsSync(source))
     throw error('   ! Invalid source path defined');
   for(const item of fs.readdirSync(source)) {
     var asset = path.join(source, item);
     var stat = fs.statSync(asset);
-    if (stat.isDirectory()) {
+    if (stat.isDirectory() && recursive) {
       var newdir = createDirectory(path.join(target,item));
       cloneDirectories(asset, newdir);
     }
@@ -97,8 +127,8 @@ export function readYamlFile(filename) {
 /**
  * @param {string} filename
  */
-export function writeYamlFile(folder, filename, data) {
-  fs.writeFileSync(path.join(folder, filename), yaml.dump(data), 'utf8');
+export function writeYamlFile(filename, data) {
+  fs.writeFileSync(filename, yaml.dump(data), 'utf8');
 }
 
 // Read data file
@@ -125,9 +155,11 @@ export function writeDataFile(filename, data) {
   switch(path.extname(filename).toLowerCase()) {
     case '.json':
       writeJsonFile(filename, data);
+      break;
     case '.yaml':
       writeYamlFile(filename, data);
+      break;
     default:
-      throw error(`Invalid file type for ${filename}`);
+      throw error(`Invalid file type for ${filename} with ext '${path.extname(filename).toLowerCase()}'`);
   } 
 }

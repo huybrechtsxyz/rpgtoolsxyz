@@ -1,18 +1,20 @@
 'use strict';
 
 import fs from 'fs';
+import path from 'path';
+import { error } from 'console';
 
 import CONFIG from '../config.js';
-import { createDirectory, cloneDirectories, readDataFile, writeDataFile } from "../lib/filesystem.js";
-import { error } from 'console';
 import projectItem from '../items/projectItem.js';
 import moduleItem from '../items/moduleItem.js';
-import { create } from 'domain';
-import path from 'path';
+import moduleBuilderFoundry from './moduleBuilderFoundry.js';
+
+import { createDirectory, cloneDirectories, readDataFile, writeDataFile } from "../lib/filesystem.js";
 
 class moduleBuilder {
   project;
   module;
+  options;
   builder;
 
   /**
@@ -24,7 +26,8 @@ class moduleBuilder {
   constructor(project, module, options) {
     this.project = project;
     this.module = module;
-
+    this.options = options;
+    
     if (options && options.vtt && options.vtt != '') {
       this.module.vtt = options.vtt;
       this.module.path = options.location;
@@ -46,39 +49,51 @@ class moduleBuilder {
     }
 
     // Does module location exists?
-    createOutputDirectories(project);
-    let buildPath = path.resolve(path.join(project.path,CONFIG.buildPath,module.name));     // project/obj/module
-    let outputPath = path.resolve(path.join(project.path,CONFIG.outputPath,module.name));   // project/dist/module
-    let modulePath = path.resolve(path.join(project.path,CONFIG.modulePath,module.name));   // project/mods/module
+    this.createOutputDirectories(this.project, this.module); 
+    let buildPath = path.resolve(path.join(this.project.path,CONFIG.buildPath,this.module.name));     // project/obj/module
+    let outputPath = path.resolve(path.join(this.project.path,CONFIG.outputPath,this.module.name));   // project/dist/module
+    let modulePath = path.resolve(path.join(this.project.path,CONFIG.modulePath,this.module.name));   // project/mods/module
     
     // Read module configuration
+    console.log(` - Building module ${this.module.name} ... reading ${path.resolve(path.join(modulePath, CONFIG.moduleFile))}`);
     let moduleData = await readDataFile(path.resolve(path.join(modulePath, CONFIG.moduleFile)));
-    console.log(` - Building module ... ${moduleData.id} (${moduleData.version})`);
-    moduleVersion = increaseVersion(moduleData.version, options);
+    console.log(` - Building module ${this.module.name} ... ${moduleData.module.id} (${moduleData.module.version})`);
+    let moduleVersion = this.increaseVersion(moduleData.module.version, this.options);
     if (moduleData.version != moduleVersion) {
-      console.log(` - Building module ... updating version to '${moduleVersion}'`);
+      console.log(` - Building module ${this.module.name} ... updating to '${moduleVersion}'`);
     }
 
     // Write new module configuration
-    if (moduleData.version != moduleVersion) {
+    if (moduleData.module.version != moduleVersion) {
+      console.log(` - Building module ${this.module.name} ... updating configuration`);
       writeDataFile(path.resolve(path.join(modulePath, CONFIG.moduleFile)));
     }
 
     // Actions for VTT BEFORE
-    if (this.builder)
-      this.builder.beforeBuild(project,module,assetsPath,buildPath,outputPath,modulePath);
+    console.log(` - Building module ${this.module.name} ... before build`);
+    if (this.builder) {
+      await this.builder.beforeBuild(this.project, this.module, buildPath, outputPath, modulePath);
+    }
     
     // Actions for VTT POST
-    if (this.builder)
-      this.builder.createBuild(project,module,buildPath,outputPath,modulePath);
+    console.log(` - Building module ${this.module.name} ... creating build`);
+    if (this.builder) {
+      await this.builder.createBuild(this.project, this.module, buildPath, outputPath, modulePath);
+    }
 
     // Actions for VTT POST
-    if (this.builder)
-      this.builder.postBuild(project,module,buildPath,outputPath,modulePath);
+    console.log(` - Building module ${this.module.name} ... after build`);
+    if (this.builder) {
+      await this.builder.postBuild(this.project, this.module, buildPath, outputPath, modulePath);
+    }
 
     // Actions for OUTPUT
-    if (this.builder)
-      this.builder.createOutput(project,module,buildPath,outputPath,modulePath);
+    console.log(` - Building module ${this.module.name} ... creating output`);
+    if (this.builder) {
+      await this.builder.createOutput(this.project, this.module, buildPath, outputPath, modulePath);
+    }
+
+    console.log(` - Building module ${this.module.name} ... finished`);
   }
 
   /**
@@ -87,29 +102,29 @@ class moduleBuilder {
    * @param {moduleItem} module 
    */
   createOutputDirectories(project, module) {
-    let outputPath = path.resolve(path.join(project.path,CONFIG.modulePath,module.name));
-    if (!fs.existsSync(outputPath))
+    let checkPath = path.resolve(path.join(project.path,CONFIG.modulePath,module.name));
+    if (!fs.existsSync(checkPath))
       throw error(`Invalid path ${modulePath} for module ${module.name}`);
 
     // Build path
-    outputPath = path.join(project.path, CONFIG.buildPath);
-    if (!fs.existsSync(outputPath))
-      createDirectory(outputPath);
+    checkPath = path.join(project.path, CONFIG.buildPath);
+    if (!fs.existsSync(checkPath))
+      createDirectory(checkPath);
 
     // Build path module
-    outputPath = path.join(outputPath, module.name);
-    if (!fs.existsSync(outputPath))
-      createDirectory(outputPath);
+    checkPath = path.join(checkPath, module.name);
+    if (!fs.existsSync(checkPath))
+      createDirectory(checkPath);
 
     // Dist path
-    outputPath = path.join(project.path, CONFIG.outputPath);
-    if (!fs.existsSync(outputPath))
-      createDirectory(outputPath);
+    checkPath = path.join(project.path, CONFIG.outputPath);
+    if (!fs.existsSync(checkPath))
+      createDirectory(checkPath);
 
     // Dist path module
-    outputPath = path.join(outputPath, module.name);
-    if (!fs.existsSync(outputPath))
-      createDirectory(outputPath);
+    checkPath = path.join(checkPath, module.name);
+    if (!fs.existsSync(checkPath))
+      createDirectory(checkPath);
   }
 
   /**
