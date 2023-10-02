@@ -104,7 +104,7 @@ class moduleBuilderFoundry {
     console.log(` - Building module ${module.name} FoundryVTT ... create output`);
 
     // Copy new module file
-    this.output_copyManifestFile(project, module);
+    await this.output_copyManifestFile(project, module);
 
     // Create Module Zip
     await this.ouput_createModuleZip(project, module);
@@ -190,13 +190,13 @@ class moduleBuilderFoundry {
    * @param {projectItem} project 
    * @param {moduleItem} module 
    */
-  output_copyManifestFile(project, module) {
+  async output_copyManifestFile(project, module) {
     console.log(` - Building module ${module.name} FoundryVTT ... module.json`);
     let source = path.join(project.path, CONFIG.buildPath, module.name, "module.json");
     let target = path.join(project.path, CONFIG.outputPath, module.name, "module.json");
     console.log(`    - source: ${source}`);
     console.log(`    - target: ${target}`);
-    if (!fs.existsSync(source))
+    if (fs.existsSync(source))
       copyFile(source, target, true);
   }
 

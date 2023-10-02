@@ -8,7 +8,7 @@ import JSZip from 'jszip';
 import { error } from 'console';
 
 /**
- * Saves a folder as zip. Use fullpaths!
+ * ASYNC. Saves a folder as zip. Use fullpaths! 
  * @param {string} pathToZip 
  * @param {string} saveAsFile 
  */
@@ -31,6 +31,14 @@ export async function zipFolder(pathToZip, saveAsFile) {
   process.chdir(cwd);
 }
 
+/**
+ * ASYNC.
+ * @param {string} pathToZip 
+ * @param {JSZip} zip 
+ * @param {boolean} recursive 
+ * @param {string} indentation 
+ * @returns 
+ */
 async function addToZip(pathToZip, zip, recursive = true, indentation = '       ') {
   if (!fs.existsSync(pathToZip))
     throw error('   ! Invalid source path defined');
@@ -52,6 +60,7 @@ async function addToZip(pathToZip, zip, recursive = true, indentation = '       
 }
 
 /**
+ * SYNC.
  * @param {fs.PathLike} folder
  */
 export function createDirectory(folder) {
@@ -62,7 +71,7 @@ export function createDirectory(folder) {
 }
 
 /**
- * 
+ * SYNC.
  * @param {source file} source 
  * @param {target file} target 
  * @param {boolean} overwrite target
@@ -71,12 +80,12 @@ export function createDirectory(folder) {
 export function copyFile(source, target, overwrite = false) {
   if (!fs.existsSync(source))
     throw error('   ! Invalid source path defined');
-  if (fs.existsSync(source)) { if (!overwrite) return; }
-  fs.copyFileSync(asset, file);
+  if (fs.existsSync(target)) { if (!overwrite) return; }
+  fs.copyFileSync(source, target);
 }
 
 /**
- *
+ * SYNC.
  * @param {string} source
  * @param {string} target
  */
@@ -101,22 +110,25 @@ export function cloneDirectories(source, target, recursive = true) {
 
 // Read JSON file
 /**
+ * SYNC.
  * @param {string} fileName
  */
-export async function readJsonFile(fileName) {
-  return JSON.parse(await fsp.readFile(new URL('file://' + fileName, import.meta.url), 'utf-8'));
+export function readJsonFile(fileName) {
+  return JSON.parse(fs.readFileSync(new URL('file://' + fileName, import.meta.url), 'utf-8'));
 }
 
 // Write JSON file
 /**
+ * SYNC.
  * @param {string} filename
  */
 export function writeJsonFile(filename, data) {
-  fs.writeFile(filename, JSON.stringify(data), err => { if (err) { throw err; } });
+  fs.writeFileSync(filename, JSON.stringify(data), err => { if (err) { throw err; } });
 }
 
 // Read YAML file
 /**
+ * SYNC
  * @param {string} fileName
  */
 export function readYamlFile(filename) {
@@ -125,6 +137,7 @@ export function readYamlFile(filename) {
 
 // Write YAML file
 /**
+ * SYNC
  * @param {string} filename
  */
 export function writeYamlFile(filename, data) {
@@ -133,6 +146,7 @@ export function writeYamlFile(filename, data) {
 
 // Read data file
 /**
+ * SYNC
  * @param {string} filename
  */
 export function readDataFile(filename) {
@@ -148,17 +162,16 @@ export function readDataFile(filename) {
 
 // Write data file
 /**
+ * SYNC
  * @param {string} filename
  * @param {object} data
  */
 export function writeDataFile(filename, data) {
   switch(path.extname(filename).toLowerCase()) {
     case '.json':
-      writeJsonFile(filename, data);
-      break;
+      writeJsonFile(filename, data); break;
     case '.yaml':
-      writeYamlFile(filename, data);
-      break;
+      writeYamlFile(filename, data); break;
     default:
       throw error(`Invalid file type for ${filename} with ext '${path.extname(filename).toLowerCase()}'`);
   } 
