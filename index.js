@@ -1,5 +1,5 @@
-function helloNpm() {
-  return "hello NPM"
+function addNumbers(a, b) {
+  return a + b;
 }
 
-export default helloNpm
+export default addNumbers;
